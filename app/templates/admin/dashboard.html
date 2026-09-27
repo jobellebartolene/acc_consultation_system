@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Super Admin Dashboard</h1>
+    <p class="subtitle">System-wide overview of users and consultations.</p>
+  </div>
+  <div class="actions-row">
+    <a href="{{ url_for('admin.user_create') }}" class="btn">+ New User</a>
+    <a href="{{ url_for('admin.consultation_create') }}" class="btn secondary">+ New Consultation</a>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card"><div class="value">{{ stats.total_users }}</div><div class="label">Total Users</div></div>
+  <div class="stat-card"><div class="value">{{ stats.total_experts }}</div><div class="label">Medical Experts</div></div>
+  <div class="stat-card"><div class="value">{{ stats.total_students }}</div><div class="label">Students</div></div>
+  <div class="stat-card"><div class="value">{{ stats.total_consultations }}</div><div class="label">Total Consultations</div></div>
+  <div class="stat-card"><div class="value">{{ stats.open_consultations }}</div><div class="label">Open Consultations</div></div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">Recent Consultations</h3>
+  {% if recent_consultations %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Title</th><th>Patient</th><th>Expert</th><th>Status</th><th>Created</th></tr></thead>
+      <tbody>
+        {% for c in recent_consultations %}
+        <tr>
+          <td><a href="{{ url_for('admin.consultation_detail', cid=c.id) }}">{{ c.title }}</a></td>
+          <td>{{ c.patient_name }}</td>
+          <td>{{ c.expert.full_name if c.expert else '—' }}</td>
+          <td><span class="badge status-{{ c.status }}">{{ c.status.replace('_',' ').title() }}</span></td>
+          <td>{{ c.created_at.strftime('%Y-%m-%d') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">No consultations yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}System Settings{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>System Settings</h1>
+    <p class="subtitle">Configuration reference for this deployment.</p>
+  </div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">Security Policy</h3>
+  <p>Passwords are hashed with Werkzeug's PBKDF2 implementation and never stored in plain text.</p>
+  <p>Accounts lock automatically for {{ config.LOCKOUT_MINUTES if config else 15 }} minutes after {{ config.MAX_LOGIN_ATTEMPTS if config else 5 }} consecutive failed login attempts.</p>
+  <p>Sessions expire after 8 hours of inactivity and use HttpOnly, SameSite=Lax cookies.</p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">Role Permissions</h3>
+  <ul>
+    <li><strong>Super Admin</strong> &mdash; full access: manage all accounts, all consultations, and system settings.</li>
+    <li><strong>Medical Expert</strong> &mdash; manage only consultations assigned to them; add clinical notes and diagnoses.</li>
+    <li><strong>Student</strong> &mdash; read-only access to consultations they are assigned to observe.</li>
+  </ul>
+</div>
+{% endblock %}

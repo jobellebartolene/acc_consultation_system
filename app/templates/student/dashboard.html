@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Observed Cases{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Observed Cases</h1>
+    <p class="subtitle">Consultations you have been assigned to observe as a learning case.</p>
+  </div>
+</div>
+
+<div class="readonly-banner">You have view-only access. You cannot edit diagnoses, patient records, or manage users.</div>
+
+<div class="card">
+  {% if consultations %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Title</th><th>Patient</th><th>Expert</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for c in consultations %}
+        <tr>
+          <td>{{ c.title }}</td>
+          <td>{{ c.patient_name }}</td>
+          <td>{{ c.expert.full_name if c.expert else '—' }}</td>
+          <td><span class="badge status-{{ c.status }}">{{ c.status.replace('_',' ').title() }}</span></td>
+          <td><a href="{{ url_for('student.consultation_detail', cid=c.id) }}" class="btn secondary small">View</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">You haven't been assigned to observe any consultations yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

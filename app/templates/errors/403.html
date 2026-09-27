@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}403 Forbidden{% endblock %}
+{% block content %}
+<div class="error-page">
+  <div class="code">403</div>
+  <h1>Access denied</h1>
+  <p>You don't have permission to view this page with your current role.</p>
+  <a href="{{ url_for('main.dashboard') if current_user.is_authenticated else url_for('auth.login') }}" class="btn">Back to safety</a>
+</div>
+{% endblock %}

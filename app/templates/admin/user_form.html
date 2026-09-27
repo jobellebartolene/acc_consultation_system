@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit User' if user else 'New User' }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ 'Edit User' if user else 'Create New User' }}</h1>
+    <p class="subtitle">{{ 'Update account details, role, or reset password.' if user else 'Add a new Super Admin, Medical Expert, or Student account.' }}</p>
+  </div>
+  <a href="{{ url_for('admin.user_list') }}" class="btn secondary">&larr; Back to Users</a>
+</div>
+
+<div class="card" style="max-width:620px;">
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-grid">
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" value="{{ user.username if user else form.get('username','') }}" {{ 'readonly' if user else '' }} required minlength="3">
+        {% if user %}<small class="hint">Username cannot be changed after creation.</small>{% endif %}
+      </div>
+      <div class="field">
+        <label for="full_name">Full Name</label>
+        <input type="text" id="full_name" name="full_name" value="{{ user.full_name if user else form.get('full_name','') }}" required>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ user.email if user else form.get('email','') }}" required>
+      </div>
+      <div class="field">
+        <label for="role">Role</label>
+        <select id="role" name="role" required>
+          {% for value, label in roles %}
+          <option value="{{ value }}" {{ 'selected' if (user and user.role==value) or (form.get('role')==value) }}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="password">{{ 'Reset Password (optional)' if user else 'Password' }}</label>
+      <input type="password" id="password" name="password" minlength="8" {{ '' if user else 'required' }}>
+      <small class="hint">Minimum 8 characters. {{ 'Leave blank to keep the current password.' if user else '' }}</small>
+    </div>
+    <button type="submit" class="btn">{{ 'Save Changes' if user else 'Create User' }}</button>
+  </form>
+</div>
+{% endblock %}

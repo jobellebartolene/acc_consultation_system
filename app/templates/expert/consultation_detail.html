@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ consultation.title }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ consultation.title }}</h1>
+    <p class="subtitle">Patient: {{ consultation.patient_name }} ({{ consultation.patient_age or '—' }}, {{ consultation.patient_gender or '—' }})</p>
+  </div>
+  <a href="{{ url_for('expert.dashboard') }}" class="btn secondary">&larr; Back</a>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">Patient Record &amp; Diagnosis</h3>
+  <form method="POST" action="{{ url_for('expert.consultation_update', cid=consultation.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label for="description">Case Description</label>
+      <textarea id="description" name="description">{{ consultation.description or '' }}</textarea>
+    </div>
+    <div class="field">
+      <label for="diagnosis">Diagnosis</label>
+      <textarea id="diagnosis" name="diagnosis">{{ consultation.diagnosis or '' }}</textarea>
+    </div>
+    <div class="field" style="max-width:260px;">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        {% for value, label in statuses %}
+        <option value="{{ value }}" {{ 'selected' if consultation.status==value }}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn">Save Patient Record</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">Clinical Notes ({{ consultation.notes|length }})</h3>
+  {% if consultation.notes %}
+  <div class="notes-list" style="margin-bottom:1.2rem;">
+    {% for n in consultation.notes %}
+    <div class="note-item {{ 'diagnosis' if n.note_type=='diagnosis' }}">
+      <div class="meta"><span>{{ n.author.full_name }} &middot; {{ n.note_type.title() }}</span><span>{{ n.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
+      <div>{{ n.content }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state" style="padding:1rem;">No clinical notes yet.</div>
+  {% endif %}
+
+  <form method="POST" action="{{ url_for('expert.add_note', cid=consultation.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-grid">
+      <div class="field" style="max-width:220px;">
+        <label for="note_type">Note Type</label>
+        <select id="note_type" name="note_type">
+          <option value="note">General Note</option>
+          <option value="diagnosis">Diagnosis Note</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="content">Add Note</label>
+      <textarea id="content" name="content" placeholder="Clinical observations, follow-up plan, etc." required></textarea>
+    </div>
+    <button type="submit" class="btn">Add Note</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">Students Observing This Case</h3>
+  {% if consultation.observing_students %}
+    <ul>
+      {% for s in consultation.observing_students %}<li>{{ s.full_name }}</li>{% endfor %}
+    </ul>
+  {% else %}
+    <div class="empty-state">No students assigned to observe this case.</div>
+  {% endif %}
+</div>
+{% endblock %}

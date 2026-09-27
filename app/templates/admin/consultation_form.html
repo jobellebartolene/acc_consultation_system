@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit Consultation' if consultation else 'New Consultation' }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ 'Edit Consultation' if consultation else 'Create New Consultation' }}</h1>
+    <p class="subtitle">Assign a Medical Expert and, optionally, students to observe.</p>
+  </div>
+  <a href="{{ url_for('admin.consultation_list') }}" class="btn secondary">&larr; Back</a>
+</div>
+
+<div class="card" style="max-width:720px;">
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label for="title">Consultation Title</label>
+      <input type="text" id="title" name="title" value="{{ consultation.title if consultation else form.get('title','') }}" required>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="patient_name">Patient Name</label>
+        <input type="text" id="patient_name" name="patient_name" value="{{ consultation.patient_name if consultation else form.get('patient_name','') }}" required>
+      </div>
+      <div class="field">
+        <label for="patient_age">Patient Age</label>
+        <input type="number" id="patient_age" name="patient_age" min="0" max="130" value="{{ consultation.patient_age if consultation else form.get('patient_age','') }}">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="patient_gender">Patient Gender</label>
+        <select id="patient_gender" name="patient_gender">
+          {% set g = consultation.patient_gender if consultation else form.get('patient_gender') %}
+          <option value="">— unspecified —</option>
+          <option value="Female" {{ 'selected' if g=='Female' }}>Female</option>
+          <option value="Male" {{ 'selected' if g=='Male' }}>Male</option>
+          <option value="Other" {{ 'selected' if g=='Other' }}>Other</option>
+        </select>
+      </div>
+      {% if consultation %}
+      <div class="field">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          {% for value, label in status_choices %}
+          <option value="{{ value }}" {{ 'selected' if consultation.status==value }}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+    </div>
+    <div class="field">
+      <label for="description">Case Description</label>
+      <textarea id="description" name="description">{{ consultation.description if consultation else form.get('description','') }}</textarea>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="expert_id">Assigned Medical Expert</label>
+        <select id="expert_id" name="expert_id">
+          <option value="">— unassigned —</option>
+          {% for e in experts %}
+          <option value="{{ e.id }}" {{ 'selected' if consultation and consultation.expert_id==e.id }}>{{ e.full_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label>Observing Students</label>
+        <div class="checkbox-list">
+          {% set observing_ids = consultation.observing_students|map(attribute='id')|list if consultation else [] %}
+          {% for s in students %}
+          <label><input type="checkbox" name="student_ids" value="{{ s.id }}" {{ 'checked' if s.id in observing_ids }}> {{ s.full_name }}</label>
+          {% else %}
+          <span class="hint">No student accounts yet.</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn">{{ 'Save Changes' if consultation else 'Create Consultation' }}</button>
+  </form>
+</div>
+{% endblock %}

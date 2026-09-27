@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Manage Users</h1>
+    <p class="subtitle">Create, edit, disable, or delete accounts across all roles.</p>
+  </div>
+  <a href="{{ url_for('admin.user_create') }}" class="btn">+ New User</a>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.full_name }}</td>
+          <td>{{ u.username }}</td>
+          <td>{{ u.email }}</td>
+          <td><span class="badge role-{{ u.role }}">{{ u.role_label }}</span></td>
+          <td>
+            {% if u.is_active_account %}<span class="badge status-open">Active</span>
+            {% else %}<span class="badge inactive">Disabled</span>{% endif %}
+            {% if u.is_locked() %}<span class="badge status-closed">Locked</span>{% endif %}
+          </td>
+          <td>{{ u.last_login_at.strftime('%Y-%m-%d %H:%M') if u.last_login_at else 'Never' }}</td>
+          <td class="actions-row">
+            <a href="{{ url_for('admin.user_edit', user_id=u.id) }}" class="btn secondary small">Edit</a>
+            {% if u.id != current_user.id %}
+            <form class="inline" method="POST" action="{{ url_for('admin.user_toggle_active', user_id=u.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn secondary small">{{ 'Disable' if u.is_active_account else 'Enable' }}</button>
+            </form>
+            <form class="inline" method="POST" action="{{ url_for('admin.user_delete', user_id=u.id) }}" onsubmit="return confirm('Delete user {{ u.username }}? This cannot be undone.');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn danger small">Delete</button>
+            </form>
+            {% else %}
+            <span class="badge">You</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7"><div class="empty-state">No users found.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

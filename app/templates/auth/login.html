@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in &middot; ACC Consultation System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <h1><span class="dot" style="width:12px;height:12px;border-radius:3px;background:var(--primary);display:inline-block;"></span> ACC Consultation System</h1>
+      <p class="tag">Sign in to access your dashboard.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-list">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('auth.login') }}" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required autofocus>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn" style="width:100%;justify-content:center;">Sign In</button>
+      </form>
+
+      <div class="demo-creds">
+        <strong>Demo credentials</strong> (seeded data):<br>
+        Super Admin &mdash; <code>admin</code> / <code>Admin@12345</code><br>
+        Medical Expert &mdash; <code>dr.santos</code> / <code>Expert@12345</code><br>
+        Student &mdash; <code>student.reyes</code> / <code>Student@12345</code><br>
+        <em>Change these before any real deployment.</em>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

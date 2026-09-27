@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}My Consultations{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>My Consultations</h1>
+    <p class="subtitle">Cases assigned to you as the responsible Medical Expert.</p>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card"><div class="value">{{ stats.total }}</div><div class="label">Total Assigned</div></div>
+  <div class="stat-card"><div class="value">{{ stats.open }}</div><div class="label">Open</div></div>
+  <div class="stat-card"><div class="value">{{ stats.in_progress }}</div><div class="label">In Progress</div></div>
+  <div class="stat-card"><div class="value">{{ stats.closed }}</div><div class="label">Closed</div></div>
+</div>
+
+<div class="card">
+  {% if consultations %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Title</th><th>Patient</th><th>Status</th><th>Students Observing</th><th>Updated</th><th></th></tr></thead>
+      <tbody>
+        {% for c in consultations %}
+        <tr>
+          <td>{{ c.title }}</td>
+          <td>{{ c.patient_name }}</td>
+          <td><span class="badge status-{{ c.status }}">{{ c.status.replace('_',' ').title() }}</span></td>
+          <td>{{ c.observing_students|length }}</td>
+          <td>{{ c.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+          <td><a href="{{ url_for('expert.consultation_detail', cid=c.id) }}" class="btn secondary small">Open</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">No consultations assigned to you yet. Ask a Super Admin to assign one.</div>
+  {% endif %}
+</div>
+{% endblock %}

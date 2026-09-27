@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Manage Consultations{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>All Consultations</h1>
+    <p class="subtitle">System-wide view of every consultation, expert, and observing students.</p>
+  </div>
+  <a href="{{ url_for('admin.consultation_create') }}" class="btn">+ New Consultation</a>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Title</th><th>Patient</th><th>Expert</th><th>Students</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for c in consultations %}
+        <tr>
+          <td><a href="{{ url_for('admin.consultation_detail', cid=c.id) }}">{{ c.title }}</a></td>
+          <td>{{ c.patient_name }}</td>
+          <td>{{ c.expert.full_name if c.expert else '— unassigned —' }}</td>
+          <td>{{ c.observing_students|length }}</td>
+          <td><span class="badge status-{{ c.status }}">{{ c.status.replace('_',' ').title() }}</span></td>
+          <td class="actions-row">
+            <a href="{{ url_for('admin.consultation_edit', cid=c.id) }}" class="btn secondary small">Edit</a>
+            <form class="inline" method="POST" action="{{ url_for('admin.consultation_delete', cid=c.id) }}" onsubmit="return confirm('Delete consultation \'{{ c.title }}\'?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn danger small">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6"><div class="empty-state">No consultations yet.</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

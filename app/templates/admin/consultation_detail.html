@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ consultation.title }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ consultation.title }}</h1>
+    <p class="subtitle">Patient: {{ consultation.patient_name }} &middot; <span class="badge status-{{ consultation.status }}">{{ consultation.status.replace('_',' ').title() }}</span></p>
+  </div>
+  <a href="{{ url_for('admin.consultation_edit', cid=consultation.id) }}" class="btn secondary">Edit</a>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">Case Details</h3>
+  <p><strong>Age:</strong> {{ consultation.patient_age or '—' }} &nbsp;|&nbsp; <strong>Gender:</strong> {{ consultation.patient_gender or '—' }}</p>
+  <p><strong>Description:</strong><br>{{ consultation.description or 'No description provided.' }}</p>
+  <p><strong>Diagnosis:</strong><br>{{ consultation.diagnosis or 'No diagnosis recorded yet.' }}</p>
+  <p><strong>Assigned Expert:</strong> {{ consultation.expert.full_name if consultation.expert else '— unassigned —' }}</p>
+  <p><strong>Observing Students:</strong>
+    {% if consultation.observing_students %}
+      {{ consultation.observing_students|map(attribute='full_name')|join(', ') }}
+    {% else %} None {% endif %}
+  </p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">Clinical Notes ({{ consultation.notes|length }})</h3>
+  {% if consultation.notes %}
+  <div class="notes-list">
+    {% for n in consultation.notes %}
+    <div class="note-item {{ 'diagnosis' if n.note_type=='diagnosis' }}">
+      <div class="meta"><span>{{ n.author.full_name }} &middot; {{ n.note_type.title() }}</span><span>{{ n.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
+      <div>{{ n.content }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">No clinical notes yet.</div>
+  {% endif %}
+</div>
+{% endblock %}
